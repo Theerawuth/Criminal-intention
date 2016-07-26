@@ -24,7 +24,9 @@ public abstract class SingleFragmentActivity extends FragmentActivity {
         {
             f = onCreateFragment();
 
-            fm.beginTransaction().add(R.id.fragment_container, f).commit();
+            fm.beginTransaction()
+                    .add(R.id.fragment_container, f)
+                    .commit();
             Log.d(CrimeListFragment.TAG ,"Fragment is created");
 
         }
