@@ -29,7 +29,7 @@ public class CrimeListFragment extends Fragment {
 
     protected  static final String TAG = "CRIME_LIST";
 
-    private int crimePos;
+    private Integer[] crimePos;
 
     @Nullable
     @Override
@@ -48,20 +48,23 @@ public class CrimeListFragment extends Fragment {
     /**
      * Update UI
      */
-    private void updateUI(){
+    private void updateUI() {
         CrimeLab crimeLab = CrimeLab.getInstance(getActivity());
         List<Crime> crimes = crimeLab.getCrime();
 
-        if(adapter == null)
-        {
+        if (adapter == null) {
             adapter = new CrimeAdapter(crimes);
             crimeRecycleView.setAdapter(adapter);
-        }
-        else
-        {
-            adapter.notifyItemChanged(crimePos);
-        }
+        } else {
+            //
+            if (crimePos != null) {
+                for (Integer pos : crimePos) {
+                    adapter.notifyItemChanged(pos);
+                    Log.d(TAG, "notify change at " + crimePos);
+                }
 
+            }
+        }
     }
 
     @Override
@@ -81,7 +84,7 @@ public class CrimeListFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == REQUEST_UPDATED_CRIME){
             if(resultCode == Activity.RESULT_OK){
-                crimePos = (int) data.getExtras().get("position");
+                crimePos = (Integer[]) data.getExtras().get("position");
                 Log.d(TAG, "get crimePos =" + crimePos);
             }
 
@@ -151,8 +154,6 @@ public class CrimeListFragment extends Fragment {
 
             Crime crime = crimes.get(position);
             holder.bind(crime, position);
-
-
         }
 
         @Override

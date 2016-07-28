@@ -70,6 +70,7 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 crime.setTitle(s.toString());
+                addThisPositionToResult(position);
             }
 
             @Override
@@ -90,10 +91,17 @@ public class CrimeFragment extends Fragment {
                 Log.d(CrimeListFragment.TAG,"Crime:" + crime.toString());
             }
         });
+
         Intent intent = new Intent();
         intent.putExtra("position", position);
         getActivity().setResult(Activity.RESULT_OK, intent);
 
         return v;
+    }
+
+    private void addThisPositionToResult(int position){
+        if(getActivity() instanceof CrimePagerActivity){
+            ((CrimePagerActivity) getActivity()).addPageUpdate(position);
+        }
     }
 }
