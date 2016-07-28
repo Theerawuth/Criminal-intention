@@ -1,8 +1,10 @@
 package com.augmentis.ayp.crimin;
 
+import java.sql.Time;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.SimpleTimeZone;
 import java.util.UUID;
 
 /**
@@ -13,6 +15,7 @@ public class Crime {
     private String title;
     private Date crimeDate;
     private boolean solved;
+    private Time crimeTime;
 
     public Crime() {
         id = UUID.randomUUID();
@@ -53,12 +56,24 @@ public class Crime {
         this.solved = solved;
     }
 
+    public String getCrimeTime() {
+        SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm aa");
+        Date dt = new Date();
+        String strValue = timeFormat.format(dt);
+        return strValue;
+    }
+
+    public void setCrimeTime(Time crimeTime) {
+        this.crimeTime = crimeTime;
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("UUID=").append(id);
         builder.append(",Title=").append(title);
         builder.append(",Crime Date").append(crimeDate);
+        builder.append(",Crime Time").append(crimeTime);
         builder.append(", Solved").append(solved);
         return builder.toString();
     }

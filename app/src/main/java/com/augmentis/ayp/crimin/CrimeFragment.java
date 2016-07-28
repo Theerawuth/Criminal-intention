@@ -29,10 +29,13 @@ public class CrimeFragment extends Fragment {
     private static final String CRIME_POSITION = "CrimeFragment.CRIME_POS";
     private static final String DIALOG_DATE = "CrimeFragment.CRIME.DIALOG";
     private static final int REQUEST_DATE = 12345;
+    private static final int REQUEST_TIME = 12;
+    private static final String DIALOG_TIME = "CrimeFragment.CRIME.TIME" ;
     private Crime crime;
     private int position;
     private EditText editText;
     private Button crimeDateButton;
+    private Button crimeTimeButton;
     private CheckBox crimeSolvedCheckbox;
 
     public CrimeFragment()
@@ -96,10 +99,24 @@ public class CrimeFragment extends Fragment {
 
                 dialogFragment.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
                 dialogFragment.show(fm, DIALOG_DATE);
-
             }
 
         });
+
+        crimeTimeButton = (Button) v.findViewById(R.id.crime_time);
+        crimeTimeButton.setText(crime.getCrimeTime());
+        crimeTimeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fm = getFragmentManager();
+                TimePickerFragment timedialogFragment - TimePickerFragment.newInstance(crime.getCrimeTime());
+
+                timedialogFragment.setTargetFragment(CrimeFragment.this, REQUEST_TIME);
+                timedialogFragment.show(fm, DIALOG_TIME);
+            }
+        });
+
+
 
         crimeSolvedCheckbox = (CheckBox) v.findViewById(R.id.crime_solved);
         crimeSolvedCheckbox.setChecked(crime.getSolved());

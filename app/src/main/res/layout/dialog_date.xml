@@ -5,6 +5,6 @@
     android:layout_height="match_parent"
     android:calendarViewShown="false"
     android:id="@+id/date_picker_in_dialog"
-    android:calendarTextColor="@color/colorPrimaryDark">
+                                            >
 
 </DatePicker>
