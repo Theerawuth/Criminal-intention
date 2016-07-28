@@ -88,7 +88,6 @@ public class CrimeListFragment extends Fragment {
                 Log.d(TAG, "get crimePos =" + crimePos);
             }
 
-
             Log.d(TAG, "Return from CrimeFragment");
         }
     }
@@ -117,7 +116,7 @@ public class CrimeListFragment extends Fragment {
             _crime = crime;
             _position = position;
             titleTextView.setText(_crime.getTitle());
-            dateTextView.setText(_crime.getCrimeDate());
+            dateTextView.setText(_crime.getCrimeDate().toString());
             solvedCheckBox.setChecked(_crime.getSolved());
         }
 

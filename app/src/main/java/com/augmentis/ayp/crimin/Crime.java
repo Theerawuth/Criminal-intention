@@ -35,11 +35,9 @@ public class Crime {
         this.title = title;
     }
 
-    public String getCrimeDate() {
-        //String stringDate = DateFormat.getDateTimeInstance().format(crimeDate);
-        SimpleDateFormat format = new SimpleDateFormat("dd MMMM yyyy");
-        String dateTime = format.format(new Date());
-        return dateTime;
+    public Date getCrimeDate() {
+
+        return crimeDate;
 
     }
 
