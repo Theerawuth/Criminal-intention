@@ -18,6 +18,7 @@ import android.widget.EditText;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -31,12 +32,14 @@ public class CrimeFragment extends Fragment {
     private static final int REQUEST_DATE = 12345;
     private static final int REQUEST_TIME = 12;
     private static final String DIALOG_TIME = "CrimeFragment.CRIME.TIME" ;
+    private CrimeLab crimeLab;
+
     private Crime crime;
-    private int position;
     private EditText editText;
     private Button crimeDateButton;
-    private Button crimeTimeButton;
+//    private Button crimeTimeButton;
     private CheckBox crimeSolvedCheckbox;
+    private Button crimeDeleteButton;
 
     public CrimeFragment()
     {
@@ -56,7 +59,7 @@ public class CrimeFragment extends Fragment {
         super.onCreate(savedInstanceState);
         UUID crimeId = (UUID) getArguments().getSerializable(CRIME_ID);
 
-        position = getArguments().getInt(CRIME_POSITION);
+
         crime = CrimeLab.getInstance(getActivity()).getCrimeById(crimeId);
         Log.d(CrimeListFragment.TAG,"crime.getId()=" +crime.getId());
         Log.d(CrimeListFragment.TAG,"crime.getTitle()=" +crime.getTitle());
@@ -78,7 +81,6 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 crime.setTitle(s.toString());
-                addThisPositionToResult(position);
             }
 
             @Override
@@ -93,7 +95,7 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                // เรียกใช้ Dialog
+                // เรียกใช้ Dialog DATE
                 FragmentManager fm = getFragmentManager();
                 DatePickerFragment dialogFragment = DatePickerFragment.newInstance(crime.getCrimeDate());
 
@@ -102,21 +104,6 @@ public class CrimeFragment extends Fragment {
             }
 
         });
-
-        crimeTimeButton = (Button) v.findViewById(R.id.crime_time);
-        crimeTimeButton.setText(crime.getCrimeTime());
-        crimeTimeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FragmentManager fm = getFragmentManager();
-                TimePickerFragment timedialogFragment - TimePickerFragment.newInstance(crime.getCrimeTime());
-
-                timedialogFragment.setTargetFragment(CrimeFragment.this, REQUEST_TIME);
-                timedialogFragment.show(fm, DIALOG_TIME);
-            }
-        });
-
-
 
         crimeSolvedCheckbox = (CheckBox) v.findViewById(R.id.crime_solved);
         crimeSolvedCheckbox.setChecked(crime.getSolved());
@@ -128,18 +115,47 @@ public class CrimeFragment extends Fragment {
             }
         });
 
+        crimeDeleteButton = (Button) v.findViewById(R.id.delete_button);
+        crimeDeleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                 crimeLab = CrimeLab.getInstance(getActivity());
+                List<Crime> crimeList = crimeLab.getCrime();
+                for(int i =0; i < crimeList.size(); i++)
+                {
+                    if(crime.getId() == crimeList.get(i).getId())
+                    {
+                        crimeLab.getCrime().remove(i);
+                    }
+                }
+                getActivity().finish();
+
+            }
+        });
+
+
+//        crimeTimeButton = (Button) v.findViewById(R.id.crime_time);
+//        crimeTimeButton.setText(crime.getCrimeTime());
+//        crimeTimeButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                FragmentManager fm = getFragmentManager();
+//                TimePickerFragment timedialogFragment - TimePickerFragment.newInstance(crime.getCrimeTime());
+//
+//                timedialogFragment.setTargetFragment(CrimeFragment.this, REQUEST_TIME);
+//                timedialogFragment.show(fm, DIALOG_TIME);
+//            }
+//        });
+
+
+
+
         Intent intent = new Intent();
-        intent.putExtra("position", position);
         getActivity().setResult(Activity.RESULT_OK, intent);
 
         return v;
     }
 
-    private void addThisPositionToResult(int position){
-        if(getActivity() instanceof CrimePagerActivity){
-            ((CrimePagerActivity) getActivity()).addPageUpdate(position);
-        }
-    }
 
     @Override
     public void onActivityResult(int requestCode, int result, Intent data) {
@@ -153,7 +169,7 @@ public class CrimeFragment extends Fragment {
             //set
             crime.setCrimeDate(date);
             crimeDateButton.setText(getFormattedDate(crime.getCrimeDate()));
-            addThisPositionToResult(position);
+
         }
     }
 

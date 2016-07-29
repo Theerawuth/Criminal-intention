@@ -5,4 +5,9 @@
     <string name="crime_detail_label">Detail</string>
     <string name="crime_title_label">Title</string>
     <string name="date_picker_title">Pick Date</string>
+    <string name="new_crime">new_crime</string>
+    <string name="show_subtitle">show_subtitle</string>
+    <string name="show_test_1">show_test</string>
+    <string name="subtitle_format">%d Crime(s)</string>
+    <string name="hide_subtitle">Hide Subtitle</string>
 </resources>

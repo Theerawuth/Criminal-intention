@@ -44,4 +44,15 @@
         android:layout_marginRight="16dp"
         android:padding="16dp"/>
 
+    <Button
+        android:id="@+id/delete_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:padding="16dp"
+        android:text="Delete"
+        />
+
+
 </LinearLayout>

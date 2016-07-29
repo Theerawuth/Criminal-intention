@@ -5,10 +5,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -22,6 +26,7 @@ import java.util.List;
 public class CrimeListFragment extends Fragment {
 
     private static final int REQUEST_UPDATED_CRIME = 200;
+    private static final String SUBTITLE_VISIBLE_STATE = "Subtitle";
 
     private CrimeAdapter adapter;
 
@@ -30,6 +35,10 @@ public class CrimeListFragment extends Fragment {
     protected  static final String TAG = "CRIME_LIST";
 
     private Integer[] crimePos;
+
+    private boolean _subtitleVisible;
+
+
 
     @Nullable
     @Override
@@ -40,10 +49,16 @@ public class CrimeListFragment extends Fragment {
         crimeRecycleView = (RecyclerView) v.findViewById(R.id.crime_recycle_view);
         crimeRecycleView.setLayoutManager(new LinearLayoutManager(getActivity())); //สร้างLayoutให้กับRecycleViewเพื่อส่งมันไปใช้
 
+        if(savedInstanceState != null){
+            _subtitleVisible = savedInstanceState.getBoolean(SUBTITLE_VISIBLE_STATE);
+        }
+
+
         updateUI();
 
         return v;
     }
+
 
     /**
      * Update UI
@@ -56,21 +71,89 @@ public class CrimeListFragment extends Fragment {
             adapter = new CrimeAdapter(crimes);
             crimeRecycleView.setAdapter(adapter);
         } else {
-            //
-            if (crimePos != null) {
-                for (Integer pos : crimePos) {
-                    adapter.notifyItemChanged(pos);
-                    Log.d(TAG, "notify change at " + crimePos);
-                }
+            adapter.notifyDataSetChanged();
 
-            }
+//            if (crimePos != null) {
+//                for (Integer pos : crimePos) {
+//                    adapter.notifyItemChanged(pos);
+//                    Log.d(TAG, "notify change at " + crimePos);
+//                }
+//
+//            }
         }
+        updateSubTitle();
     }
 
+    // Set Menu ALL
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        //set option menu
+        setHasOptionsMenu(true);
+
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.crime_list_menu, menu);
+
+        //Get Menuitem: Subtitle
+        MenuItem menuItem = menu.findItem(R.id.menu_item_show_subtitle);
+        if(_subtitleVisible)
+        {
+            menuItem.setTitle(R.string.hide_subtitle);
+        }
+        else
+        {
+            menuItem.setTitle(R.string.show_subtitle);
+        }
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.menu_item_new_crime:
+
+                Crime crime = new Crime();
+                CrimeLab.getInstance(getActivity()).addCrime(crime); //TODO AddCrime() to Crime
+                Intent intent = CrimePagerActivity.newIntent(getActivity(), crime.getId());
+                startActivity(intent);
+                return true; // จะไม่มีอะไรทำต่อจากนี้แล้วหรือ Success
+
+            case R.id.menu_item_show_subtitle:
+                _subtitleVisible = !_subtitleVisible;
+                getActivity().invalidateOptionsMenu();
+                updateSubTitle();
+                return true;
+
+            //default case
+            default:
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public void updateSubTitle(){
+        CrimeLab crimeLab = CrimeLab.getInstance(getActivity());
+        int crimeCount = crimeLab.getCrime().size();
+        String subTitle = getString(R.string.subtitle_format, crimeCount);
+
+
+        if(!_subtitleVisible){
+            subTitle = null;
+        }
+        AppCompatActivity appCompatActivity = (AppCompatActivity) getActivity();
+        appCompatActivity.getSupportActionBar().setSubtitle(subTitle);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putBoolean(SUBTITLE_VISIBLE_STATE, _subtitleVisible);
     }
 
     @Override
@@ -82,14 +165,6 @@ public class CrimeListFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == REQUEST_UPDATED_CRIME){
-            if(resultCode == Activity.RESULT_OK){
-                crimePos = (Integer[]) data.getExtras().get("position");
-                Log.d(TAG, "get crimePos =" + crimePos);
-            }
-
-            Log.d(TAG, "Return from CrimeFragment");
-        }
     }
 
     private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -123,7 +198,7 @@ public class CrimeListFragment extends Fragment {
         @Override
         public void onClick(View v) {
 
-            Intent intent = CrimePagerActivity.newIntent(getActivity(), _crime.getId(), _position);
+            Intent intent = CrimePagerActivity.newIntent(getActivity(), _crime.getId());
             startActivityForResult(intent,REQUEST_UPDATED_CRIME );
 
         }
