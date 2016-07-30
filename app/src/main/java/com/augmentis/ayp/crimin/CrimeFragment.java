@@ -37,7 +37,7 @@ public class CrimeFragment extends Fragment {
     private Crime crime;
     private EditText editText;
     private Button crimeDateButton;
-//    private Button crimeTimeButton;
+    private Button crimeTimeButton;
     private CheckBox crimeSolvedCheckbox;
     private Button crimeDeleteButton;
 
@@ -115,6 +115,20 @@ public class CrimeFragment extends Fragment {
             }
         });
 
+        crimeTimeButton = (Button) v.findViewById(R.id.crime_time);
+        crimeTimeButton.setText(crime.getCrimeTime());
+
+//        crimeTimeButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                FragmentManager fm = getFragmentManager();
+//                TimePickerFragment timeDialogFragment = TimePickerFragment.newInstance(crime.getCrimeTime());
+//
+//                timeDialogFragment.setTargetFragment(CrimeFragment.this, REQUEST_TIME);
+//                timeDialogFragment.show(fm, DIALOG_TIME);
+//            }
+//        });
+
         crimeDeleteButton = (Button) v.findViewById(R.id.delete_button);
         crimeDeleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -134,18 +148,6 @@ public class CrimeFragment extends Fragment {
         });
 
 
-//        crimeTimeButton = (Button) v.findViewById(R.id.crime_time);
-//        crimeTimeButton.setText(crime.getCrimeTime());
-//        crimeTimeButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                FragmentManager fm = getFragmentManager();
-//                TimePickerFragment timedialogFragment - TimePickerFragment.newInstance(crime.getCrimeTime());
-//
-//                timedialogFragment.setTargetFragment(CrimeFragment.this, REQUEST_TIME);
-//                timedialogFragment.show(fm, DIALOG_TIME);
-//            }
-//        });
 
 
 

@@ -31,7 +31,6 @@ public class DatePickerFragment extends DialogFragment implements DialogInterfac
         args.putSerializable("ARG_DATE", date); // ดึงค่ามาแล้วส่งค่าไป
         df.setArguments(args);
         return df;
-
     }
 
 
