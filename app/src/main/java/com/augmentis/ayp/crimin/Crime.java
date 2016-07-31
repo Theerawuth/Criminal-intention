@@ -16,12 +16,10 @@ public class Crime {
     private String title;
     private Date crimeDate;
     private boolean solved;
-    private Date crimeTime;
 
     public Crime() {
         id = UUID.randomUUID();
         crimeDate = new Date();
-        crimeTime = new Date();
     }
 
     public UUID getId() {
@@ -58,25 +56,12 @@ public class Crime {
         this.solved = solved;
     }
 
-    public String getCrimeTime() {
-        Calendar c = Calendar.getInstance();
-        Date time = c.getTime();
-        SimpleDateFormat df = new SimpleDateFormat("HH:mm a");
-        String strTime = df.format(time);
-        return strTime;
-    }
-
-    public void setCrimeTime(Time crimeTime) {
-        this.crimeTime = crimeTime;
-    }
-
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("UUID=").append(id);
         builder.append(",Title=").append(title);
         builder.append(",Crime Date").append(crimeDate);
-        builder.append(",Crime Time").append(crimeTime);
         builder.append(", Solved").append(solved);
         return builder.toString();
     }

@@ -1,6 +1,7 @@
 package com.augmentis.ayp.crimin;
 
 import android.app.Activity;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -116,18 +117,16 @@ public class CrimeFragment extends Fragment {
         });
 
         crimeTimeButton = (Button) v.findViewById(R.id.crime_time);
-        crimeTimeButton.setText(crime.getCrimeTime());
-
-//        crimeTimeButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                FragmentManager fm = getFragmentManager();
-//                TimePickerFragment timeDialogFragment = TimePickerFragment.newInstance(crime.getCrimeTime());
-//
-//                timeDialogFragment.setTargetFragment(CrimeFragment.this, REQUEST_TIME);
-//                timeDialogFragment.show(fm, DIALOG_TIME);
-//            }
-//        });
+        crimeTimeButton.setText(getFormattedTime(crime.getCrimeDate()));
+        crimeTimeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fm = getFragmentManager();
+                TimePickerFragment timeDialogFragment = TimePickerFragment.newInstance(crime.getCrimeDate());
+                timeDialogFragment.setTargetFragment(CrimeFragment.this, REQUEST_TIME);
+                timeDialogFragment.show(fm, DIALOG_TIME);
+            }
+        });
 
         crimeDeleteButton = (Button) v.findViewById(R.id.delete_button);
         crimeDeleteButton.setOnClickListener(new View.OnClickListener() {
@@ -146,10 +145,6 @@ public class CrimeFragment extends Fragment {
 
             }
         });
-
-
-
-
 
 
         Intent intent = new Intent();
@@ -171,11 +166,23 @@ public class CrimeFragment extends Fragment {
             //set
             crime.setCrimeDate(date);
             crimeDateButton.setText(getFormattedDate(crime.getCrimeDate()));
-
         }
+
+        if(requestCode == REQUEST_TIME){
+            Date date = (Date) data.getSerializableExtra(TimePickerFragment.EXTRA_TIME);
+
+            //set
+            crime.setCrimeDate(date);
+            crimeTimeButton.setText(getFormattedTime(crime.getCrimeDate()));
+        }
+
     }
 
     private String getFormattedDate(Date crimeDate) {
         return new SimpleDateFormat("dd MMMM yyyy").format(crimeDate);
+    }
+
+    private String getFormattedTime(Date crimeDate) {
+        return new SimpleDateFormat("hh:mm a").format(crimeDate);
     }
 }

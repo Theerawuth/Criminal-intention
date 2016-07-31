@@ -22,7 +22,8 @@ import java.util.GregorianCalendar;
  */
 public class DatePickerFragment extends DialogFragment implements DialogInterface.OnClickListener{
 
-    protected static final String EXTRA_DATE = "ble" ;
+    protected static final String EXTRA_DATE = "DatePicker" ;
+
 
     // Step1
     public static DatePickerFragment newInstance(Date date){
