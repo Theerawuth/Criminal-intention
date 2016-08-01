@@ -47,21 +47,32 @@ public class CrimeFragment extends Fragment {
 
     }
 
-    public static CrimeFragment newInstance(UUID crimeId, int position){
+    public static CrimeFragment newInstance(UUID crimeId){
         Bundle args = new Bundle();
         args.putSerializable(CRIME_ID,crimeId);
-        args.putInt(CRIME_POSITION,position);
+
+
         CrimeFragment crimeFragment = new CrimeFragment();
         crimeFragment.setArguments(args);
         return crimeFragment;
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
-        UUID crimeId = (UUID) getArguments().getSerializable(CRIME_ID);
 
+        CrimeLab crimeLab = CrimeLab.getInstance(getActivity());
+//        if(getArguments().get(CRIME_ID) != null){
+            UUID crimeId = (UUID) getArguments().getSerializable(CRIME_ID);
+            crime = crimeLab.getCrimeById(crimeId);
+//        }
+//        else
+//        {
+//            Crime crime = new Crime();
+//            crimeLab.addCrime(crime);
+//            this.crime = crime;
+//        }
 
-        crime = CrimeLab.getInstance(getActivity()).getCrimeById(crimeId);
         Log.d(CrimeListFragment.TAG,"crime.getId()=" +crime.getId());
         Log.d(CrimeListFragment.TAG,"crime.getTitle()=" +crime.getTitle());
 
@@ -111,7 +122,8 @@ public class CrimeFragment extends Fragment {
         crimeSolvedCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                crime.setSolved(isChecked);
+                    crime.setSolved(isChecked);
+
                 Log.d(CrimeListFragment.TAG,"Crime:" + crime.toString());
             }
         });
@@ -132,16 +144,16 @@ public class CrimeFragment extends Fragment {
         crimeDeleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                 crimeLab = CrimeLab.getInstance(getActivity());
-                List<Crime> crimeList = crimeLab.getCrime();
-                for(int i =0; i < crimeList.size(); i++)
-                {
-                    if(crime.getId() == crimeList.get(i).getId())
-                    {
-                        crimeLab.getCrime().remove(i);
-                    }
-                }
-                getActivity().finish();
+                CrimeLab.getInstance(getActivity()).deleteCrime(crime.getId());
+//                List<Crime> crimeList = crimeLab.getCrime();
+//                for(int i =0; i < crimeList.size(); i++)
+//                {
+//                    if(crime.getId() == crimeList.get(i).getId())
+//                    {
+//                        crimeLab.getCrime().remove(i);
+//                    }
+//                }
+                  getActivity().finish();
 
             }
         });
@@ -176,6 +188,13 @@ public class CrimeFragment extends Fragment {
             crimeTimeButton.setText(getFormattedTime(crime.getCrimeDate()));
         }
 
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        CrimeLab.getInstance(getActivity()).updateCrime(crime); // update crime in db
     }
 
     private String getFormattedDate(Date crimeDate) {

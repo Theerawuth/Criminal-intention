@@ -16,9 +16,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by Theerawuth on 7/18/2016.
@@ -53,7 +55,6 @@ public class CrimeListFragment extends Fragment {
             _subtitleVisible = savedInstanceState.getBoolean(SUBTITLE_VISIBLE_STATE);
         }
 
-
         updateUI();
 
         return v;
@@ -71,16 +72,10 @@ public class CrimeListFragment extends Fragment {
             adapter = new CrimeAdapter(crimes);
             crimeRecycleView.setAdapter(adapter);
         } else {
+            adapter.setCrimes(crimeLab.getCrime());
             adapter.notifyDataSetChanged();
-
-//            if (crimePos != null) {
-//                for (Integer pos : crimePos) {
-//                    adapter.notifyItemChanged(pos);
-//                    Log.d(TAG, "notify change at " + crimePos);
-//                }
-//
-//            }
         }
+
         updateSubTitle();
     }
 
@@ -117,7 +112,7 @@ public class CrimeListFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.menu_item_new_crime:
-
+                Log.d(TAG, "ADD :");
                 Crime crime = new Crime();
                 CrimeLab.getInstance(getActivity()).addCrime(crime); //TODO AddCrime() to Crime
                 Intent intent = CrimePagerActivity.newIntent(getActivity(), crime.getId());
@@ -174,6 +169,7 @@ public class CrimeListFragment extends Fragment {
         public CheckBox solvedCheckBox;
         Crime _crime;
         int _position;
+        UUID _crimeId;
 
 
         public CrimeHolder(View itemView) {
@@ -182,12 +178,22 @@ public class CrimeListFragment extends Fragment {
             titleTextView = (TextView) itemView.findViewById(R.id.list_item_crime_title_text_view);
             dateTextView = (TextView) itemView.findViewById(R.id.list_item_crime_date_text_view);
             solvedCheckBox = (CheckBox) itemView.findViewById(R.id.list_item_crime_solved_check_box);
+            solvedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    CrimeLab crimeLab = CrimeLab.getInstance(getActivity());
+                    Crime crime = crimeLab.getCrimeById(_crime.getId());
+                    crime.setSolved(isChecked);
+                    crimeLab.updateCrime(crime);
+                }
+            });
 
             itemView.setOnClickListener(this);
 
         }
 
         public void bind(Crime crime, int position) {
+            _crimeId = crime.getId();
             _crime = crime;
             _position = position;
             titleTextView.setText(_crime.getTitle());
@@ -202,14 +208,26 @@ public class CrimeListFragment extends Fragment {
             startActivityForResult(intent,REQUEST_UPDATED_CRIME );
 
         }
+
+
+
+
+
+
+
+
     }
 
     private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder>{
-        private List<Crime> crimes;
+        private List<Crime> _crimes;
         private int viewCreatingCount;
         public CrimeAdapter(List<Crime> crimes){
 
-            this.crimes = crimes;
+            _crimes = crimes;
+        }
+
+        protected void setCrimes(List<Crime> crimes) {
+            _crimes = crimes;
         }
 
         @Override
@@ -226,13 +244,13 @@ public class CrimeListFragment extends Fragment {
         public void onBindViewHolder(CrimeHolder holder, int position) {
             Log.d(TAG, "BIND VIEW HOLDER FOR CRIMELIST : POSITION = " + position);
 
-            Crime crime = crimes.get(position);
+            Crime crime = _crimes.get(position);
             holder.bind(crime, position);
         }
 
         @Override
         public int getItemCount() {
-            return crimes.size();
+            return _crimes.size();
         }
     }
 }

@@ -20,12 +20,10 @@ public class CrimeActivity extends SingleFragmentActivity {
         return intent;
     }
 
-
     @Override
     protected Fragment onCreateFragment() {
         UUID crimeID = (UUID) getIntent().getSerializableExtra(CRIME_ID);
-        int position = (int) getIntent().getExtras().get(CRIME_POSITION);
-        Fragment fragment = CrimeFragment.newInstance(crimeID, position);
+        Fragment fragment = CrimeFragment.newInstance(crimeID);
         return fragment;
     }
 }
