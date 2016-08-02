@@ -37,6 +37,33 @@
         android:checked="false" />
 
     <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/choose_suspect"
+        android:id="@+id/crime_suspect"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_gravity="center_horizontal" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/sent_report"
+        android:id="@+id/crime_report"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_gravity="center_horizontal" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/call_crime_suspect"
+        android:id="@+id/crime_call_suspect"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_gravity="center_horizontal" />
+
+    <Button
         android:id="@+id/crime_time"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -53,6 +80,8 @@
         android:padding="16dp"
         android:text="Delete"
         />
+
+
 
 
 </LinearLayout>

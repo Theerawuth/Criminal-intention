@@ -19,6 +19,8 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -36,9 +38,11 @@ public class CrimeListFragment extends Fragment {
 
     protected  static final String TAG = "CRIME_LIST";
 
-    private Integer[] crimePos;
-
     private boolean _subtitleVisible;
+
+    private TextView showText;
+
+
 
 
 
@@ -50,6 +54,9 @@ public class CrimeListFragment extends Fragment {
 
         crimeRecycleView = (RecyclerView) v.findViewById(R.id.crime_recycle_view);
         crimeRecycleView.setLayoutManager(new LinearLayoutManager(getActivity())); //สร้างLayoutให้กับRecycleViewเพื่อส่งมันไปใช้
+        showText = (TextView) v.findViewById(R.id.show_text);
+
+
 
         if(savedInstanceState != null){
             _subtitleVisible = savedInstanceState.getBoolean(SUBTITLE_VISIBLE_STATE);
@@ -67,6 +74,13 @@ public class CrimeListFragment extends Fragment {
     private void updateUI() {
         CrimeLab crimeLab = CrimeLab.getInstance(getActivity());
         List<Crime> crimes = crimeLab.getCrime();
+        if(crimes.isEmpty()){
+            showText.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            showText.setVisibility(View.INVISIBLE);
+        }
 
         if (adapter == null) {
             adapter = new CrimeAdapter(crimes);
@@ -135,6 +149,9 @@ public class CrimeListFragment extends Fragment {
         CrimeLab crimeLab = CrimeLab.getInstance(getActivity());
         int crimeCount = crimeLab.getCrime().size();
         String subTitle = getString(R.string.subtitle_format, crimeCount);
+
+        //plurals
+        String subtitle = getResources().getQuantityString(R.plurals.subtitle_format, crimeCount, crimeCount);
 
 
         if(!_subtitleVisible){

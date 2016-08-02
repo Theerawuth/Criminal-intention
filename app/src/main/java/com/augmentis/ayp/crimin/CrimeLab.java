@@ -36,6 +36,9 @@ public class CrimeLab {
         contentValues.put(CrimeTable.Cols.TITLE, crime.getTitle());
         contentValues.put(CrimeTable.Cols.DATE, crime.getCrimeDate().getTime());
         contentValues.put(CrimeTable.Cols.SOLVED, crime.getSolved() ? 1 : 0);
+        contentValues.put(CrimeTable.Cols.SUSPECT, crime.getSuspect());
+
+
         return contentValues;
 
     }
@@ -74,14 +77,14 @@ public class CrimeLab {
 
     // Cursor คือ ตัวชี้ข้อมูลเพื่อจัดการกับข้อมูล
     public CrimeCursorWrapper queryCrimes(String whereCause, String[] whereArgs){
-        Cursor curser =  database.query(CrimeTable.NAME,
+        Cursor cursor =  database.query(CrimeTable.NAME,
                                                     null,
                                                     whereCause,
                                                     whereArgs,
                                                     null,
                                                     null,
                                                     null);
-        return new CrimeCursorWrapper(curser);
+        return new CrimeCursorWrapper(cursor);
     }
 
     public List<Crime> getCrime(){
@@ -103,7 +106,7 @@ public class CrimeLab {
         return crimes;
     }
 
-    // add crime in Crimelist using for Menubar
+
     public void addCrime(Crime crime) {
         ContentValues contentValues = getContentValues(crime);
         database.insert(CrimeTable.NAME, null, contentValues);
