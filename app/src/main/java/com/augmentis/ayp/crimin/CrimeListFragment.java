@@ -180,7 +180,7 @@ public class CrimeListFragment extends Fragment {
     }
 
     private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
+        public String pathPicture;
         public TextView titleTextView;
         public TextView dateTextView;
         public CheckBox solvedCheckBox;

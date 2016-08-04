@@ -31,5 +31,6 @@
     <string name="send_report">Sent crime report via</string>
     <string name="call_crime_suspect">Call Suspect</string>
     <string name="Please_Add_Title">Please Add Title</string>
+    <string name="denied_permission_to_call">Denied Permission To Call</string>
 
 </resources>

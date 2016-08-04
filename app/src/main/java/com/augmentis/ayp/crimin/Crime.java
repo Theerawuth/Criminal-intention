@@ -70,6 +70,12 @@ public class Crime {
         this.solved = solved;
     }
 
+    ///
+
+    public String getPhotoFilename(){
+        return  "IMF_" + getId().toString() + " .jpg";
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
