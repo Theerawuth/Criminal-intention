@@ -1,7 +1,9 @@
 package com.augmentis.ayp.crimin;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -17,10 +19,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.io.File;
+import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,31 +39,48 @@ public class CrimeListFragment extends Fragment {
 
     private CrimeAdapter adapter;
 
-    private  RecyclerView crimeRecycleView;
+    private RecyclerView crimeRecycleView;
 
-    protected  static final String TAG = "CRIME_LIST";
+    protected static final String TAG = "CRIME_LIST";
 
     private boolean _subtitleVisible;
 
     private TextView showText;
 
+    private Callbacks callbacks;
 
+    public interface  Callbacks {
+        void onCrimeSelected(Crime crime);
+    }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        callbacks = (Callbacks) context;
+    }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        callbacks = null;
+    }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
-    {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_crime_list, container, false);
+
+        List<Crime> crimes = CrimeLab.getInstance(getActivity()).getCrime();
+        if (!crimes.isEmpty()) {
+            Crime crime = CrimeLab.getInstance(getActivity()).getCrime().get(0);
+            callbacks.onCrimeSelected(crime);
+        }
 
         crimeRecycleView = (RecyclerView) v.findViewById(R.id.crime_recycle_view);
         crimeRecycleView.setLayoutManager(new LinearLayoutManager(getActivity())); //สร้างLayoutให้กับRecycleViewเพื่อส่งมันไปใช้
         showText = (TextView) v.findViewById(R.id.show_text);
 
-
-
-        if(savedInstanceState != null){
+        if (savedInstanceState != null) {
             _subtitleVisible = savedInstanceState.getBoolean(SUBTITLE_VISIBLE_STATE);
         }
 
@@ -71,14 +93,13 @@ public class CrimeListFragment extends Fragment {
     /**
      * Update UI
      */
-    private void updateUI() {
+    public void updateUI() {
         CrimeLab crimeLab = CrimeLab.getInstance(getActivity());
         List<Crime> crimes = crimeLab.getCrime();
-        if(crimes.isEmpty()){
+
+        if (crimes.isEmpty()) {
             showText.setVisibility(View.VISIBLE);
-        }
-        else
-        {
+        } else {
             showText.setVisibility(View.INVISIBLE);
         }
 
@@ -95,9 +116,9 @@ public class CrimeListFragment extends Fragment {
 
     // Set Menu ALL
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState)
-    {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
 
         //set option menu
         setHasOptionsMenu(true);
@@ -111,12 +132,9 @@ public class CrimeListFragment extends Fragment {
 
         //Get Menuitem: Subtitle
         MenuItem menuItem = menu.findItem(R.id.menu_item_show_subtitle);
-        if(_subtitleVisible)
-        {
+        if (_subtitleVisible) {
             menuItem.setTitle(R.string.hide_subtitle);
-        }
-        else
-        {
+        } else {
             menuItem.setTitle(R.string.show_subtitle);
         }
 
@@ -124,13 +142,17 @@ public class CrimeListFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.menu_item_new_crime:
                 Log.d(TAG, "ADD :");
                 Crime crime = new Crime();
                 CrimeLab.getInstance(getActivity()).addCrime(crime); //TODO AddCrime() to Crime
-                Intent intent = CrimePagerActivity.newIntent(getActivity(), crime.getId());
-                startActivity(intent);
+
+                //support tablet
+                updateUI();
+                callbacks.onCrimeSelected(crime);
+//                Intent intent = CrimePagerActivity.newIntent(getActivity(), crime.getId());
+//                startActivity(intent);
                 return true; // จะไม่มีอะไรทำต่อจากนี้แล้วหรือ Success
 
             case R.id.menu_item_show_subtitle:
@@ -141,11 +163,11 @@ public class CrimeListFragment extends Fragment {
 
             //default case
             default:
-            return super.onOptionsItemSelected(item);
+                return super.onOptionsItemSelected(item);
         }
     }
 
-    public void updateSubTitle(){
+    public void updateSubTitle() {
         CrimeLab crimeLab = CrimeLab.getInstance(getActivity());
         int crimeCount = crimeLab.getCrime().size();
         String subTitle = getString(R.string.subtitle_format, crimeCount);
@@ -154,7 +176,7 @@ public class CrimeListFragment extends Fragment {
         String subtitle = getResources().getQuantityString(R.plurals.subtitle_format, crimeCount, crimeCount);
 
 
-        if(!_subtitleVisible){
+        if (!_subtitleVisible) {
             subTitle = null;
         }
         AppCompatActivity appCompatActivity = (AppCompatActivity) getActivity();
@@ -172,7 +194,7 @@ public class CrimeListFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Log.d(TAG, "Resume list");
-        updateUI();
+        updateUI(); // refresh List
     }
 
     @Override
@@ -180,30 +202,23 @@ public class CrimeListFragment extends Fragment {
     }
 
     private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        public String pathPicture;
+
         public TextView titleTextView;
         public TextView dateTextView;
         public CheckBox solvedCheckBox;
         Crime _crime;
         int _position;
         UUID _crimeId;
+        ImageView photoView;
+        File filePhoto;
 
 
         public CrimeHolder(View itemView) {
             super(itemView);
-
+            photoView = (ImageView) itemView.findViewById(R.id.list_item_crime_photo);
             titleTextView = (TextView) itemView.findViewById(R.id.list_item_crime_title_text_view);
             dateTextView = (TextView) itemView.findViewById(R.id.list_item_crime_date_text_view);
             solvedCheckBox = (CheckBox) itemView.findViewById(R.id.list_item_crime_solved_check_box);
-            solvedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    CrimeLab crimeLab = CrimeLab.getInstance(getActivity());
-                    Crime crime = crimeLab.getCrimeById(_crime.getId());
-                    crime.setSolved(isChecked);
-                    crimeLab.updateCrime(crime);
-                }
-            });
 
             itemView.setOnClickListener(this);
 
@@ -216,58 +231,69 @@ public class CrimeListFragment extends Fragment {
             titleTextView.setText(_crime.getTitle());
             dateTextView.setText(_crime.getCrimeDate().toString());
             solvedCheckBox.setChecked(_crime.getSolved());
+            solvedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                    CrimeLab crimeLab = CrimeLab.getInstance(getActivity());
+                    Crime crime = crimeLab.getCrimeById(_crime.getId());
+                    crime.setSolved(isChecked);
+                    crimeLab.updateCrime(crime);
+                    callbacks.onCrimeSelected(crime);
+
+                }
+            });
+
+            CrimeLab crimeLab = CrimeLab.getInstance(getActivity());
+            filePhoto = crimeLab.getPhotoFile(_crime);
+
+            Bitmap bitmap = PictureUtile.getScaledBitmap(filePhoto.getPath(), getActivity());
+            photoView.setImageBitmap(bitmap);
         }
 
         @Override
         public void onClick(View v) {
+            Log.d(TAG, "send position : " + _position);
+            callbacks.onCrimeSelected(_crime);
 
-            Intent intent = CrimePagerActivity.newIntent(getActivity(), _crime.getId());
-            startActivityForResult(intent,REQUEST_UPDATED_CRIME );
-
-        }
-
-
-
-
-
-
-
-
-    }
-
-    private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder>{
-        private List<Crime> _crimes;
-        private int viewCreatingCount;
-        public CrimeAdapter(List<Crime> crimes){
-
-            _crimes = crimes;
-        }
-
-        protected void setCrimes(List<Crime> crimes) {
-            _crimes = crimes;
-        }
-
-        @Override
-        public CrimeHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            viewCreatingCount++;
-            Log.d(TAG, "CREATE VIEW HOLDER FOR CRIMELIST : CREATING VIEW TIME= "+ viewCreatingCount);
-
-            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            View v = layoutInflater.inflate(R.layout.list_item_crime, parent, false);
-            return new CrimeHolder(v);
-        }
-
-        @Override
-        public void onBindViewHolder(CrimeHolder holder, int position) {
-            Log.d(TAG, "BIND VIEW HOLDER FOR CRIMELIST : POSITION = " + position);
-
-            Crime crime = _crimes.get(position);
-            holder.bind(crime, position);
-        }
-
-        @Override
-        public int getItemCount() {
-            return _crimes.size();
         }
     }
-}
+
+        private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder> {
+            private List<Crime> _crimes;
+            private int viewCreatingCount;
+
+            public CrimeAdapter(List<Crime> crimes) {
+
+                _crimes = crimes;
+            }
+
+            protected void setCrimes(List<Crime> crimes) {
+                _crimes = crimes;
+            }
+
+            @Override
+            public CrimeHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                viewCreatingCount++;
+                Log.d(TAG, "CREATE VIEW HOLDER FOR CRIMELIST : CREATING VIEW TIME= " + viewCreatingCount);
+
+                LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
+                View v = layoutInflater.inflate(R.layout.list_item_crime, parent, false);
+                return new CrimeHolder(v);
+            }
+
+            @Override
+            public void onBindViewHolder(CrimeHolder holder, int position) {
+                Log.d(TAG, "BIND VIEW HOLDER FOR CRIMELIST : POSITION = " + position);
+
+                Crime crime = _crimes.get(position);
+                holder.bind(crime, position);
+            }
+
+            @Override
+            public int getItemCount() {
+                return _crimes.size();
+            }
+        }
+    }
+

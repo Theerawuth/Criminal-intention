@@ -4,19 +4,21 @@
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
     android:layout_marginLeft="@dimen/activity_horizontal_margin"
-    android:layout_marginRight="@dimen/activity_horizontal_margin">
+    android:layout_marginRight="@dimen/activity_horizontal_margin"
+    style="?android:listSeparatorTextViewStyle">
 
     <!-- Photo -->
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="2">
+        android:layout_weight="2"
+        >
 
         <ImageView
             android:id="@+id/crime_photo"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:scaleType="centerInside"
             android:background="@android:color/darker_gray"
             android:cropToPadding="true"
@@ -24,8 +26,9 @@
 
         <ImageButton
             android:id="@+id/crime_camera"
-            android:layout_width="match_parent"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
+            android:scaleType="centerInside"
             android:src="@android:drawable/ic_menu_camera"/>
 
     </LinearLayout>
@@ -35,11 +38,15 @@
         android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="3">
+        android:layout_gravity="top"
+        android:layout_weight="15">
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/crime_title_label"
+            android:textSize="20sp"
+            android:padding="20dp"
+
             style="?android:listSeparatorTextViewStyle"/>
         <EditText
             android:id="@+id/crime_title"
